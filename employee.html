@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Employee Dashboard | Milktea Payroll</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="dashboard active">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h2>🧋 Milktea</h2>
+          <p id="empUsername">Employee Panel</p>
+        </div>
+        <ul class="nav-menu">
+          <li class="nav-item active" onclick="showSection('empDashboard')">
+            📊 Dashboard
+          </li>
+          <li class="nav-item" onclick="showSection('empAttendance')">
+            ⏰ Time & Attendance
+          </li>
+          <li class="nav-item" onclick="showSection('empLeave')">
+            📅 Leave Request
+          </li>
+          <li class="nav-item" onclick="showSection('empPayslips')">
+            💰 Payslips
+          </li>
+          <li class="nav-item" onclick="showSection('empProfile')">
+            👤 Profile
+          </li>
+          <li class="nav-item" onclick="logout()">🚪 Logout</li>
+        </ul>
+      </aside>
+      <main class="main-content">
+        <div class="top-bar">
+          <h1 id="pageTitle">Dashboard</h1>
+          <div class="user-info">
+            <div class="avatar" id="empAvatar">E</div>
+            <button class="btn btn-primary btn-logout" onclick="logout()">
+              Logout
+            </button>
+          </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="empDashboard" class="section">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <h3>Today's Status</h3>
+              <div class="value" id="todayStatus" style="font-size: 1.3em">
+                Clocked Out
+              </div>
+            </div>
+            <div class="stat-card">
+              <h3>Hours This Period</h3>
+              <div class="value" id="periodHours">0h</div>
+            </div>
+            <div class="stat-card">
+              <h3>Next Payday</h3>
+              <div class="value" id="nextPayday" style="font-size: 1.1em">
+                -
+              </div>
+            </div>
+            <div class="stat-card">
+              <h3>Leave Balance</h3>
+              <div class="value" id="leaveBalance">0</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Quick Actions</h2>
+            <div class="quick-actions">
+              <button
+                class="btn btn-primary"
+                id="quickTimeBtn"
+                onclick="quickTimeAction()"
+              >
+                Clock In
+              </button>
+              <button class="btn btn-primary" onclick="showSection('empLeave')">
+                Request Leave
+              </button>
+              <button
+                class="btn btn-primary"
+                onclick="showSection('empPayslips')"
+              >
+                View Payslips
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Recent Activity</h2>
+            <ul id="recentActivity" class="leave-list"></ul>
+          </div>
+        </div>
+
+        <!-- Time & Attendance Section -->
+        <div id="empAttendance" class="section hidden">
+          <div class="card">
+            <h2>Time Tracking</h2>
+            <div class="time-display">
+              <div class="current-time" id="currentTime">--:--:--</div>
+              <div id="statusMessage" class="status-message"></div>
+            </div>
+            <div class="attendance-section">
+              <button class="time-btn in" onclick="timeIn()">
+                ⏰ Clock In
+              </button>
+              <button class="time-btn out" onclick="timeOut()">
+                ⏰ Clock Out
+              </button>
+            </div>
+          </div>
+          <div class="card">
+            <h2>Attendance History</h2>
+            <div class="filter-bar">
+              <input type="month" id="attendanceMonth" />
+              <button class="btn btn-primary" onclick="filterMyAttendance()">
+                Filter
+              </button>
+            </div>
+            <table class="employee-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Time In</th>
+                  <th>Time Out</th>
+                  <th>Hours Worked</th>
+                  <th>Overtime</th>
+                </tr>
+              </thead>
+              <tbody id="attendanceHistoryBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Leave Request Section -->
+        <div id="empLeave" class="section hidden">
+          <div class="card">
+            <h2>Request Leave</h2>
+            <form id="leaveForm" onsubmit="submitLeaveRequest(event)">
+              <div class="form-group">
+                <label>Leave Type</label>
+                <select id="leaveType" required>
+                  <option value="">Select type</option>
+                  <option>Sick Leave</option>
+                  <option>Vacation Leave</option>
+                  <option>Personal Leave</option>
+                  <option>Emergency Leave</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>From Date</label>
+                  <input type="date" id="leaveDateFrom" required />
+                </div>
+                <div class="form-group">
+                  <label>To Date</label>
+                  <input type="date" id="leaveDateTo" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Reason</label>
+                <textarea
+                  id="leaveReason"
+                  rows="3"
+                  placeholder="Brief reason for leave..."
+                  required
+                ></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">
+                Submit Request
+              </button>
+            </form>
+          </div>
+          <div class="card">
+            <h2>My Leave Requests</h2>
+            <ul id="empLeaveList" class="leave-list"></ul>
+          </div>
+        </div>
+
+        <!-- Payslips Section -->
+        <div id="empPayslips" class="section hidden">
+          <div class="card">
+            <h2>Payroll History</h2>
+            <table class="employee-table">
+              <thead>
+                <tr>
+                  <th>Period</th>
+                  <th>Regular Hours</th>
+                  <th>Overtime Hours</th>
+                  <th>Net Pay</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="payslipTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div id="empProfile" class="section hidden">
+          <div class="card">
+            <h2>Personal Information</h2>
+            <div class="profile-info">
+              <div class="profile-item">
+                <label>Full Name</label>
+                <div id="profileName">-</div>
+              </div>
+              <div class="profile-item">
+                <label>Username</label>
+                <div id="profileUsername">-</div>
+              </div>
+              <div class="profile-item">
+                <label>Email</label>
+                <div id="profileEmail">-</div>
+              </div>
+              <div class="profile-item">
+                <label>Position</label>
+                <div id="profilePosition">-</div>
+              </div>
+              <div class="profile-item">
+                <label>Hourly Rate</label>
+                <div id="profileRate">-</div>
+              </div>
+              <div class="profile-item">
+                <label>Date Hired</label>
+                <div id="profileDateHired">-</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <h2>Change Password</h2>
+            <form id="passwordForm" onsubmit="changePassword(event)">
+              <div class="form-group">
+                <label>Current Password</label>
+                <input type="password" id="currentPassword" required />
+              </div>
+              <div class="form-group">
+                <label>New Password</label>
+                <input type="password" id="newPassword" required />
+              </div>
+              <div class="form-group">
+                <label>Confirm New Password</label>
+                <input type="password" id="confirmPassword" required />
+              </div>
+              <button type="submit" class="btn btn-primary">
+                Change Password
+              </button>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Payslip Modal -->
+    <div id="payslipModal" class="modal">
+      <div class="modal-content modal-large">
+        <span class="close" onclick="closeModal('payslipModal')">&times;</span>
+        <div id="payslipContent"></div>
+        <div class="form-actions">
+          <button class="btn btn-primary" onclick="printPayslip()">
+            🖨️ Print
+          </button>
+          <button class="btn btn-primary" onclick="downloadPayslip()">
+            📥 Download
+          </button>
+          <button
+            class="btn btn-secondary"
+            onclick="closeModal('payslipModal')"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/employee.js"></script>
+  </body>
+</html>

@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manager Dashboard | Milktea Payroll</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="dashboard active">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h2>🧋 Milktea</h2>
+          <p>Manager Panel</p>
+        </div>
+        <ul class="nav-menu">
+          <li class="nav-item active" onclick="showSection('mgrDashboard')">
+            📊 Dashboard
+          </li>
+          <li class="nav-item" onclick="showSection('mgrEmployees')">
+            👥 Employees
+          </li>
+          <li class="nav-item" onclick="showSection('mgrAttendance')">
+            ⏰ Attendance
+          </li>
+          <li class="nav-item" onclick="showSection('mgrLeave')">
+            📅 Leave Management
+          </li>
+          <li class="nav-item" onclick="showSection('mgrHolidays')">
+            🎉 Holidays
+          </li>
+          <li class="nav-item" onclick="showSection('mgrPayroll')">
+            💰 Payroll
+          </li>
+          <li class="nav-item" onclick="showSection('mgrReports')">
+            📈 Reports
+          </li>
+          <li class="nav-item" onclick="showSection('mgrSettings')">
+            ⚙️ Settings
+          </li>
+          <li class="nav-item" onclick="logout()">🚪 Logout</li>
+        </ul>
+      </aside>
+      <main class="main-content">
+        <div class="top-bar">
+          <h1 id="pageTitle">Dashboard</h1>
+          <div class="user-info">
+            <div class="avatar">M</div>
+            <button class="btn btn-primary btn-logout" onclick="logout()">
+              Logout
+            </button>
+          </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="mgrDashboard" class="section">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <h3>Total Employees</h3>
+              <div class="value" id="totalEmployees">0</div>
+            </div>
+            <div class="stat-card">
+              <h3>Today's Attendance</h3>
+              <div class="value" id="todayAttendance">0</div>
+            </div>
+            <div class="stat-card">
+              <h3>Pending Leave Requests</h3>
+              <div class="value" id="pendingLeave">0</div>
+            </div>
+            <div class="stat-card">
+              <h3>Current Period</h3>
+              <div class="value" id="currentPeriod" style="font-size: 1.2em">
+                -
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <h2>Recent Leave Requests</h2>
+            <ul id="recentLeaveList" class="leave-list"></ul>
+          </div>
+        </div>
+
+        <!-- Employees Section -->
+        <div id="mgrEmployees" class="section hidden">
+          <div class="card-header">
+            <h2>Employee Management</h2>
+            <button class="btn btn-primary" onclick="showAddEmployeeModal()">
+              + Add Employee
+            </button>
+          </div>
+          <div class="card">
+            <table class="employee-table">
+              <thead>
+                <tr>
+                  <th>Photo</th>
+                  <th>Name</th>
+                  <th>Position</th>
+                  <th>Hourly Rate</th>
+                  <th>Date Hired</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="employeeTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Attendance Section -->
+        <div id="mgrAttendance" class="section hidden">
+          <div class="card">
+            <div class="filter-bar">
+              <h2>Attendance Records</h2>
+              <div class="filter-group">
+                <input type="date" id="filterDate" />
+                <select id="filterEmployee">
+                  <option value="">All Employees</option>
+                </select>
+                <button class="btn btn-primary" onclick="filterAttendance()">
+                  Filter
+                </button>
+              </div>
+            </div>
+            <table class="employee-table">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Date</th>
+                  <th>Time In</th>
+                  <th>Time Out</th>
+                  <th>Hours Worked</th>
+                  <th>Overtime</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="attendanceTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Leave Management Section -->
+        <div id="mgrLeave" class="section hidden">
+          <div class="card">
+            <h2>Leave Requests</h2>
+            <div class="tabs">
+              <button class="tab-btn active" onclick="filterLeaves('all')">
+                All
+              </button>
+              <button class="tab-btn" onclick="filterLeaves('Pending')">
+                Pending
+              </button>
+              <button class="tab-btn" onclick="filterLeaves('Approved')">
+                Approved
+              </button>
+              <button class="tab-btn" onclick="filterLeaves('Rejected')">
+                Rejected
+              </button>
+            </div>
+            <ul id="allLeaveList" class="leave-list"></ul>
+          </div>
+        </div>
+
+        <!-- Holidays Section -->
+        <div id="mgrHolidays" class="section hidden">
+          <div class="card-header">
+            <h2>Holiday Management</h2>
+            <button class="btn btn-primary" onclick="showAddHolidayModal()">
+              + Add Holiday
+            </button>
+          </div>
+          <div class="card">
+            <table class="employee-table">
+              <thead>
+                <tr>
+                  <th>Holiday Name</th>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="holidayTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Payroll Section -->
+        <div id="mgrPayroll" class="section hidden">
+          <div class="card-header">
+            <h2>Payroll Management</h2>
+            <button class="btn btn-primary" onclick="showRunPayrollModal()">
+              ▶ Run Payroll
+            </button>
+          </div>
+          <div class="card">
+            <h3>Payroll History</h3>
+            <table class="employee-table">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Period</th>
+                  <th>Regular Pay</th>
+                  <th>Overtime Pay</th>
+                  <th>Deductions</th>
+                  <th>Net Pay</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="payrollTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Reports Section -->
+        <div id="mgrReports" class="section hidden">
+          <div class="card">
+            <h2>Generate Reports</h2>
+            <div class="report-options">
+              <button
+                class="btn btn-primary"
+                onclick="generateAttendanceReport()"
+              >
+                📊 Attendance Report
+              </button>
+              <button class="btn btn-primary" onclick="generatePayrollReport()">
+                💰 Payroll Summary
+              </button>
+              <button class="btn btn-primary" onclick="generateLeaveReport()">
+                📅 Leave Report
+              </button>
+            </div>
+          </div>
+          <div class="card" id="reportOutput"></div>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="mgrSettings" class="section hidden">
+          <div class="card">
+            <h2>Shop Settings</h2>
+            <div class="form-group">
+              <label>Shop Name</label>
+              <input type="text" id="settingShopName" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Working Hours Start</label>
+                <input type="time" id="settingWorkStart" />
+              </div>
+              <div class="form-group">
+                <label>Working Hours End</label>
+                <input type="time" id="settingWorkEnd" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Overtime Rate Multiplier</label>
+                <input type="number" step="0.1" id="settingOvertimeRate" />
+              </div>
+              <div class="form-group">
+                <label>Pay Period</label>
+                <select id="settingPayPeriod">
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Base Hourly Rate</label>
+              <input type="number" id="settingRegularRate" />
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings()">
+              Save Settings
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add/Edit Employee Modal -->
+    <div id="employeeModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal('employeeModal')">&times;</span>
+        <h2 id="employeeModalTitle">Add Employee</h2>
+        <form id="employeeForm" onsubmit="saveEmployee(event)">
+          <input type="hidden" id="employeeId" />
+
+          <div class="form-group">
+            <label>Photo</label>
+            <input type="file" id="employeeAvatarInput" accept="image/*" />
+            <div class="avatar-preview-container" style="margin-top: 10px">
+              <img
+                id="employeeAvatarPreview"
+                class="avatar-preview"
+                src=""
+                alt="Avatar Preview"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="employeeFullName" required />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Username</label>
+              <input type="text" id="employeeUsername" required />
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="employeeEmail" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="employeePassword" />
+            <small>Leave blank to keep current password</small>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Position</label>
+              <input type="text" id="employeePosition" required />
+            </div>
+            <div class="form-group">
+              <label>Hourly Rate</label>
+              <input type="number" step="0.01" id="employeeRate" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Date Hired</label>
+            <input type="date" id="employeeDateHired" required />
+          </div>
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeModal('employeeModal')"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Add Holiday Modal -->
+    <div id="holidayModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal('holidayModal')">&times;</span>
+        <h2>Add Holiday</h2>
+        <form id="holidayForm" onsubmit="saveHoliday(event)">
+          <div class="form-group">
+            <label>Holiday Name</label>
+            <input type="text" id="holidayName" required />
+          </div>
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="holidayDate" required />
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="holidayPaid" checked /> Paid Holiday
+            </label>
+          </div>
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeModal('holidayModal')"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Run Payroll Modal -->
+    <div id="payrollModal" class="modal">
+      <div class="modal-content modal-large">
+        <span class="close" onclick="closeModal('payrollModal')">&times;</span>
+        <h2>Run Payroll</h2>
+        <div id="payrollPreview"></div>
+      </div>
+    </div>
+
+    <!-- Edit Attendance Modal -->
+    <div id="attendanceModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal('attendanceModal')"
+          >&times;</span
+        >
+        <h2>Edit Attendance</h2>
+        <form id="attendanceForm" onsubmit="saveAttendanceEdit(event)">
+          <input type="hidden" id="attendanceId" />
+          <div class="form-group">
+            <label>Employee</label>
+            <input type="text" id="attendanceEmployee" readonly />
+          </div>
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="attendanceDate" required />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Time In</label>
+              <input type="time" id="attendanceTimeIn" required />
+            </div>
+            <div class="form-group">
+              <label>Time Out</label>
+              <input type="time" id="attendanceTimeOut" required />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeModal('attendanceModal')"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Payslip Modal -->
+    <div id="payslipModal" class="modal">
+      <div class="modal-content modal-large">
+        <span class="close" onclick="closeModal('payslipModal')">&times;</span>
+        <div id="payslipContent"></div>
+        <div class="form-actions">
+          <button class="btn btn-primary" onclick="printPayslip()">
+            🖨️ Print
+          </button>
+          <button
+            class="btn btn-secondary"
+            onclick="closeModal('payslipModal')"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/manager.js"></script>
+  </body>
+</html>
